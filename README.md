@@ -10,8 +10,8 @@ https://alidocs.dingtalk.com/i/nodes/XPwkYGxZV32YGrg7cYobvzvEWAgozOKL
 ● Redis
 
 #### 特点:
-支持mailgun和sendgrid两种邮件发送客户端
-支持 1-redis限流 2-平滑加权轮询 两种域名选择算法模型
+● 支持mailgun和sendgrid两种邮件发送客户端
+● 支持 1-redis限流 2-平滑加权轮询 两种域名选择算法模型. 邮件发送频率很低建议使用算法模型2.
 
 #### 详细说明
 ##### 数据表使用说明
@@ -77,4 +77,8 @@ INSERT INTO `email_send_rules` (`domain_id`, `started_at`, `ended_at`, `total_se
 
 ##### 发送示例
 main.go中是使用示例
-
+```go
+//依次传入redis客户端, mysql连接客户端, 域名选择算法模型(1-redis限流 2-平滑加权轮询)
+emailSenderSrv := sender.NewSenderManager(redisCli, db, 2)
+send, err := emailSenderSrv.Send(content)
+```
