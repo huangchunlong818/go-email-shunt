@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	"emailWarming/sender"
 	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/caoyanyan37/emailWarming/sender"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"net/http"
-	"time"
 )
 
 func main() {

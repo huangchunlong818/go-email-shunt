@@ -1,13 +1,14 @@
 package sender
 
 import (
-	"emailWarming/model"
-	"emailWarming/utils"
 	"errors"
+	"strings"
+
+	"github.com/caoyanyan37/emailWarming/model"
+	"github.com/caoyanyan37/emailWarming/utils"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"strings"
 )
 
 // SenderManager管理电子邮件发送域的选择

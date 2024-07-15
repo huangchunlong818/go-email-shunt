@@ -2,10 +2,11 @@ package sender
 
 import (
 	"bytes"
-	"emailWarming/utils"
 	"encoding/json"
 	"errors"
 	"time"
+
+	"github.com/caoyanyan37/emailWarming/utils"
 )
 
 type SendgridSender struct {
