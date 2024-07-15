@@ -2,10 +2,11 @@ package sender
 
 import (
 	"bytes"
-	"emailWarming/utils"
 	"encoding/json"
 	"errors"
 	"time"
+
+	"github.com/huangchunlong818/go-email-shunt/utils"
 )
 
 type SendgridSender struct {

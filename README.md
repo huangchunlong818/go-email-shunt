@@ -5,12 +5,16 @@ https://alidocs.dingtalk.com/i/nodes/XPwkYGxZV32YGrg7cYobvzvEWAgozOKL
 
 #### 环境要求
 本功能在以下环境下开发和测试：
+
 ● Go 1.18 以上
+
 ● MySQL
+
 ● Redis
 
 #### 特点:
 ● 支持mailgun和sendgrid两种邮件发送客户端
+
 ● 支持 1-redis限流 2-平滑加权轮询 两种域名选择算法模型. 邮件发送频率很低建议使用算法模型2.
 
 #### 详细说明

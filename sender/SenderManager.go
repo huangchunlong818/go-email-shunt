@@ -1,13 +1,14 @@
 package sender
 
 import (
-	"emailWarming/model"
-	"emailWarming/utils"
 	"errors"
+	"strings"
+
+	"github.com/huangchunlong818/go-email-shunt/model"
+	"github.com/huangchunlong818/go-email-shunt/utils"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"strings"
 )
 
 // SenderManager管理电子邮件发送域的选择
@@ -16,17 +17,53 @@ type SenderManager struct {
 	db                   *gorm.DB
 	domains              []*model.EmailDomains
 	emailTypeWithDomains map[int][]*model.EmailDomains
-	ruleModel            int //域名选择算法模型 1-redis限流 2-平滑加权轮询
+	ruleModel            int             //域名选择算法模型 1-redis限流 2-平滑加权轮询
+	emailSendInfoList    []EmailSendInfo //用于电子邮件发送的配置规则, 邮件类型, 对应域ID, from邮箱
+	nonShuntingDomainIds []int           //不进行域名预热管理的域ID
+	shuntingDomainIds    []int           //进行域名预热管理的域ID, gmail才会进
 }
 
-func NewSenderManager(redisCli *redis.Client, db *gorm.DB, ruleModel int) SenderManager {
-	return SenderManager{
+func NewSenderManager(redisCli *redis.Client, db *gorm.DB, ruleModel int, nonShuntingDomainIds []int, shuntingDomainIds []int, emailSendInfoList []EmailSendInfo) SenderManager {
+	sm := SenderManager{
 		rds:                  redisCli,
 		db:                   db,
 		ruleModel:            ruleModel,
 		domains:              make([]*model.EmailDomains, 0),
 		emailTypeWithDomains: make(map[int][]*model.EmailDomains, 0),
 	}
+	if len(nonShuntingDomainIds) > 0 {
+		sm.nonShuntingDomainIds = nonShuntingDomainIds
+	} else {
+		sm.nonShuntingDomainIds = []int{13}
+	}
+
+	if len(shuntingDomainIds) > 0 {
+		sm.shuntingDomainIds = shuntingDomainIds
+	} else {
+		sm.shuntingDomainIds = []int{1, 2, 13}
+	}
+
+	if len(sm.emailSendInfoList) > 0 {
+		sm.emailSendInfoList = emailSendInfoList
+	} else {
+		sm.emailSendInfoList = []EmailSendInfo{
+			{
+				EmailTypes: []int{1, 2},
+				DomainIds:  []int{1, 9, 13},
+				EmailInfo: EmailInfo{
+					FromEmail: "no-reply@parcelpanel.net",
+				},
+			},
+			{
+				EmailTypes: []int{1, 2},
+				DomainIds:  []int{2, 3, 4, 8},
+				EmailInfo: EmailInfo{
+					FromEmail: "no-reply@parcelpanel.com",
+				},
+			},
+		}
+	}
+	return sm
 }
 
 // Send 发送一封邮件
@@ -46,6 +83,7 @@ func (sm *SenderManager) Send(message *MailContent) (*EmailSendResult, error) {
 		}
 	}
 	sender := sm.GetSenderByDomain(domain)
+	return nil, nil
 	// 发送邮件
 	result, err := sender.Send(message)
 	if err != nil {
@@ -64,8 +102,8 @@ func (sm *SenderManager) Send(message *MailContent) (*EmailSendResult, error) {
 
 // GetSendingDomainIdsByToAddr 根据收件人的电子邮件地址选择域ID
 func (sm *SenderManager) GetSendingDomainIdsByToAddr(toEmail string) []int {
-	nonShuntingDomainIds := []int{13}
-	shuntingDomainIds := []int{1, 2, 13}
+	nonShuntingDomainIds := sm.nonShuntingDomainIds
+	shuntingDomainIds := sm.shuntingDomainIds
 
 	toEmailDomain := strings.Split(toEmail, "@")[1]
 
@@ -78,22 +116,7 @@ func (sm *SenderManager) GetSendingDomainIdsByToAddr(toEmail string) []int {
 
 // GetEmailSendInfoList 返回用于电子邮件发送的配置规则
 func (sm *SenderManager) GetEmailSendInfoList() []EmailSendInfo {
-	return []EmailSendInfo{
-		{
-			EmailTypes: []int{1, 2},
-			DomainIds:  []int{1, 9, 13},
-			EmailInfo: EmailInfo{
-				FromEmail: "no-reply@parcelpanel.net",
-			},
-		},
-		{
-			EmailTypes: []int{1, 2},
-			DomainIds:  []int{2, 3, 4, 8},
-			EmailInfo: EmailInfo{
-				FromEmail: "no-reply@parcelpanel.com",
-			},
-		},
-	}
+	return sm.emailSendInfoList
 }
 
 // GetEmailTypeWithDomain 返回电子邮件类型到其相应域的映射

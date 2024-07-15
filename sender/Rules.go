@@ -2,12 +2,13 @@ package sender
 
 import (
 	"context"
-	"emailWarming/model"
-	"emailWarming/sender/ruleMode"
 	"fmt"
+	"time"
+
+	"github.com/huangchunlong818/go-email-shunt/model"
+	"github.com/huangchunlong818/go-email-shunt/sender/ruleMode"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
-	"time"
 )
 
 // 标记为使用中

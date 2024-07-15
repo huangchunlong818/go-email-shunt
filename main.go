@@ -2,14 +2,18 @@ package main
 
 import (
 	"context"
-	"emailWarming/sender"
 	"fmt"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/gin-gonic/gin"
+	"github.com/huangchunlong818/go-email-shunt/sender"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"net/http"
-	"time"
 )
 
 func main() {
@@ -45,7 +49,15 @@ func sendEmail(c *gin.Context) {
 	}
 	redisCli := getRedis()
 	db := getDb()
-	emailSenderSrv := sender.NewSenderManager(redisCli, db, 2)
+	//设置zap log
+	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+	core := zapcore.NewTee(
+		zapcore.NewCore(consoleEncoder, zapcore.Lock(os.Stdout), zap.DebugLevel),
+	)
+	log := zap.New(core, zap.AddCaller())
+	zap.ReplaceGlobals(log)
+
+	emailSenderSrv := sender.NewSenderManager(redisCli, db, 2, []int{}, []int{}, []sender.EmailSendInfo{})
 	send, err := emailSenderSrv.Send(content)
 	if err != nil {
 		c.JSON(http.StatusForbidden, baseResponse{
