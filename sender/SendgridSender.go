@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/caoyanyan37/emailWarming/utils"
+	"github.com/huangchunlong818/go-email-shunt/utils"
 )
 
 type SendgridSender struct {

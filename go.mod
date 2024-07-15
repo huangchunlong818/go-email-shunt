@@ -1,4 +1,4 @@
-module github.com/caoyanyan37/emailWarming
+module github.com/huangchunlong818/go-email-shunt
 
 go 1.21.7
 

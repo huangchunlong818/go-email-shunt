@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/caoyanyan37/emailWarming/sender"
 	"github.com/gin-gonic/gin"
+	"github.com/huangchunlong818/go-email-shunt/sender"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/caoyanyan37/emailWarming/model"
-	"github.com/caoyanyan37/emailWarming/utils"
+	"github.com/huangchunlong818/go-email-shunt/model"
+	"github.com/huangchunlong818/go-email-shunt/utils"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"gorm.io/gorm"

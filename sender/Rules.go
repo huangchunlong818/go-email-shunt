@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/caoyanyan37/emailWarming/model"
-	"github.com/caoyanyan37/emailWarming/sender/ruleMode"
+	"github.com/huangchunlong818/go-email-shunt/model"
+	"github.com/huangchunlong818/go-email-shunt/sender/ruleMode"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
